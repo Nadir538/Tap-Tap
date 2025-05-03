@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Меллстрой Тапалка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+    
+    body {
+      font-family: 'Rubik', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0f0f23 url('stream-bg.png') center/cover;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      user-select: none;
+      padding-bottom: 70px; /* Space for bottom nav */
+    }
+    
+    .header {
+      text-align: center;
+      margin-top: 20px;
+      width: 100%;
+    }
+    
+    .balance {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #00ff88;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+      margin: 10px 0;
+    }
+    
+    .energy-container {
+      width: 80%;
+      max-width: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 5px;
+      margin: 10px 0;
+    }
+    
+    .energy-bar {
+      height: 20px;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      border-radius: 8px;
+      width: 100%;
+      transition: width 0.3s;
+    }
+    
+    .energy-text {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .income-container {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 10px 20px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .income-title {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .income-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #00ff88;
+    }
+    
+    .income-plus {
+      color: #00ff88;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .coin-container {
+      margin: 10px 0;
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .coin {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle at center, #FFD700, #D4AF37);
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .coin-inner {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .streamer {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+    }
+    
+    .glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
+      animation: pulse 2s infinite alternate;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.5); }
+      100% { box-shadow: 0 0 20px 8px rgba(255, 255, 255, 0.9); }
+    }
+    
+    .click-effect {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: clickAnim 0.5s forwards;
+    }
+    
+    .plus-one {
+      position: absolute;
+      font-size: 1.5rem;
+      color: #00ff88;
+      font-weight: bold;
+      pointer-events: none;
+      animation: floatUp 1s forwards;
+      opacity: 0;
+    }
+    
+    @keyframes clickAnim {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-50px); opacity: 0; }
+    }
+    
+    .stats {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .cps {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+    }
+    
+    .nav-item.active {
+      color: #00ff88;
+    }
+    
+    .nav-icon {
+      font-size: 1.5rem;
+      margin-bottom: 3px;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .balance {
+        font-size: 2rem;
+      }
+      
+      .coin {
+        width: 180px;
+        height: 180px;
+      }
+      
+      .coin-inner {
+        width: 140px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="balance" id="balance">0</div>
+  </div>
+  
+  <div class="energy-container">
+    <div class="energy-bar" id="energy-bar"></div>
+    <div class="energy-text" id="energy-text">1000 / 1000</div>
+  </div>
+  
+  <div class="income-container">
+    <div class="income-title">ДОХОД В ЧАС</div>
+    <div class="income-value" id="hour-income">0</div>
+    <div class="income-plus">+</div>
+  </div>
+  
+  <div class="coin-container">
+    <div class="coin" id="coin">
+      <div class="coin-inner">
+        <img src="streamer.png" class="streamer" alt="Меллстрой">
+        <div class="glow"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats">
+    <div class="cps" id="cps">+1 за клик</div>
+  </div>
+  
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">🏠</span>
+      <span>Главная</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">⚡</span>
+      <span>Улучшения</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🌐</span>
+      <span>Онлайн</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span>Друзья</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🎯</span>
+      <span>Задания</span>
+    </a>
+  </div>
+  
+  <script>
+    // Игровые переменные
+    let balance = localStorage.getItem('tapBalance') ? parseInt(localStorage.getItem('tapBalance')) : 0;
+    let energy = localStorage.getItem('tapEnergy') ? parseInt(localStorage.getItem('tapEnergy')) : 1000;
+    const maxEnergy = 1000;
+    let lastTapTime = 0;
+    let tapCount = 0;
+    let cps = 0;
+    let lastUpdateTime = Date.now();
+    let hourIncome = 0; // Переменная для дохода в час
+    
+    // Элементы интерфейса
+    const balanceElement = document.getElementById('balance');
+    const energyBar = document.getElementById('energy-bar');
+    const energyText = document.getElementById('energy-text');
+    const coin = document.getElementById('coin');
+    const cpsElement = document.getElementById('cps');
+    const hourIncomeElement = document.getElementById('hour-income');
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    // Навигация
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        navItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        // Здесь можно добавить логику переключения экранов
+      });
+    });
+    
+    // Восстановление энергии при возврате на вкладку
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        recoverBackgroundEnergy();
+      }
+    });
+    
+    // Инициализация
+    updateUI();
+    startEnergyRecovery();
+    startCPSCalculator();
+    
+    // Обработка клика
+    coin.addEventListener('click', (e) => {
+      if (energy > 0) {
+        // Уменьшение энергии
+        energy--;
+        localStorage.setItem('tapEnergy', energy);
+        
+        // Увеличение баланса
+        balance++;
+        localStorage.setItem('tapBalance', balance);
+        
+        // Эффекты
+        createClickEffect(e);
+        createPlusOne(e);
+        
+        // Анимация монеты
+        animateCoin(e);
+        
+        // Обновление интерфейса
+        updateUI();
+        
+        // Подсчет CPS
+        tapCount++;
+        const now = Date.now();
+        if (now - lastTapTime > 1000) {
+          cps = Math.round(tapCount / ((now - lastTapTime) / 1000));
+          cpsElement.textContent = `${cps} кликов/сек`;
+          tapCount = 0;
+          lastTapTime = now;
+        }
+      }
+    });
+    
+    // Анимация монеты при клике
+    function animateCoin(e) {
+      const rect = coin.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Рассчитываем направление отклонения
+      const deltaX = (e.clientX - centerX) / 20;
+      const deltaY = (e.clientY - centerY) / 20;
+      
+      // Отклоняем монету
+      coin.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.95)`;
+      
+      // Возвращаем на место через 0.5 секунды
+      setTimeout(() => {
+        coin.style.transform = 'translate(0, 0) scale(1)';
+      }, 500);
+    }
+    
+    // Восстановление энергии (основное)
+    function startEnergyRecovery() {
+      setInterval(() => {
+        if (energy < maxEnergy) {
+          energy++;
+          localStorage.setItem('tapEnergy', energy);
+          updateEnergyUI();
+        }
+      }, 1000);
+    }
+    
+    // Восстановление энергии в фоне
+    function recoverBackgroundEnergy() {
+      const now = Date.now();
+      const secondsPassed = Math.floor((now - lastUpdateTime) / 1000);
+      
+      if (secondsPassed > 0) {
+        energy = Math.min(energy + secondsPassed, maxEnergy);
+        localStorage.setItem('tapEnergy', energy);
+        updateEnergyUI();
+      }
+      
+      lastUpdateTime = now;
+    }
+    
+    // Подсчет CPS
+    function startCPSCalculator() {
+      setInterval(() => {
+        const now = Date.now();
+        if (now - lastTapTime > 2000 && tapCount > 0) {
+          cps = Math.round(tapCount / ((now - lastTapTime) / 1000));
+          cpsElement.textContent = `${cps} кликов/сек`;
+          tapCount = 0;
+          lastTapTime = now;
+        }
+      }, 500);
+    }
+    
+    // Эффект клика
+    function createClickEffect(e) {
+      const effect = document.createElement('div');
+      effect.className = 'click-effect';
+      effect.style.left = `${e.clientX - 15}px`;
+      effect.style.top = `${e.clientY - 15}px`;
+      document.body.appendChild(effect);
+      
+      setTimeout(() => {
+        effect.remove();
+      }, 500);
+    }
+    
+    // Анимация "+1"
+    function createPlusOne(e) {
+      const plusOne = document.createElement('div');
+      plusOne.className = 'plus-one';
+      plusOne.textContent = '+1';
+      plusOne.style.left = `${e.clientX - 15}px`;
+      plusOne.style.top = `${e.clientY - 30}px`;
+      document.body.appendChild(plusOne);
+      
+      setTimeout(() => {
+        plusOne.remove();
+      }, 1000);
+    }
+    
+    // Обновление интерфейса
+    function updateUI() {
+      balanceElement.textContent = balance;
+      hourIncomeElement.textContent = hourIncome; // Пока просто 0, можно добавить логику расчета
+      updateEnergyUI();
+    }
+    
+    function updateEnergyUI() {
+      const percent = (energy / maxEnergy) * 100;
+      energyBar.style.width = `${percent}%`;
+      energyText.textContent = `${energy} / ${maxEnergy}`;
+      
+      // Изменение цвета при низкой энергии
+      if (energy < 300) {
+        energyBar.style.background = 'linear-gradient(90deg, #ff5555, #ff9999)';
+      } else {
+        energyBar.style.background = 'linear-gradient(90deg, #00ff88, #00ccff)';
+      }
+    }
+    
+    // Сохраняем время при закрытии
+    window.addEventListener('beforeunload', () => {
+      lastUpdateTime = Date.now();
+    });
+  </script>
+</body>
+</html>
