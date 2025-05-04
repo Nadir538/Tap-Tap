@@ -25,6 +25,16 @@
       text-align: center;
       margin-top: 20px;
       width: 100%;
+      position: relative;
+    }
+    
+    .settings-btn {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
     }
     
     .balance {
@@ -169,14 +179,135 @@
       100% { transform: translateY(-50px); opacity: 0; }
     }
     
-    .stats {
-      margin-top: 20px;
-      text-align: center;
+    /* Settings Modal */
+    .settings-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
     }
     
-    .cps {
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .settings-title {
+      font-size: 1.5rem;
+      color: #00ff88;
+    }
+    
+    .close-settings {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .skins-section {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .skins-title {
       font-size: 1.2rem;
-      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 10px;
+      color: #00ff88;
+    }
+    
+    .skins-placeholder {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1rem;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+    
+    .settings-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .control-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .control-label {
+      font-size: 1rem;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #00ff88;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    /* Volume Control */
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .volume-slider {
+      width: 100px;
     }
     
     /* Bottom Navigation */
@@ -232,6 +363,7 @@
 </head>
 <body>
   <div class="header">
+    <div class="settings-btn" id="settings-btn">⚙️</div>
     <div class="balance" id="balance">0</div>
   </div>
   
@@ -255,8 +387,56 @@
     </div>
   </div>
   
-  <div class="stats">
-    <div class="cps" id="cps">+1 за клик</div>
+  <!-- Settings Modal -->
+  <div class="settings-modal" id="settings-modal">
+    <div class="settings-header">
+      <div class="settings-title">Настройки</div>
+      <div class="close-settings" id="close-settings">✕</div>
+    </div>
+    
+    <div class="skins-section">
+      <div class="skins-title">Скины</div>
+      <div class="skins-placeholder">В разработке</div>
+    </div>
+    
+    <div class="settings-controls">
+      <div class="control-item">
+        <span class="control-label">Вибрация</span>
+        <label class="switch">
+          <input type="checkbox" id="vibration-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="control-item">
+        <span class="control-label">Звук монеты</span>
+        <label class="switch">
+          <input type="checkbox" id="sound-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="control-item">
+        <span class="control-label">Фоновая музыка</span>
+        <label class="switch">
+          <input type="checkbox" id="bg-music-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="control-item volume-control">
+        <span class="control-label">Громкость музыки</span>
+        <input type="range" min="0" max="100" value="30" class="volume-slider" id="volume-slider">
+      </div>
+      
+      <div class="control-item">
+        <span class="control-label">Фоновый доход</span>
+        <label class="switch">
+          <input type="checkbox" id="background-income-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
   </div>
   
   <!-- Bottom Navigation -->
@@ -283,6 +463,10 @@
     </a>
   </div>
   
+  <!-- Audio Elements -->
+  <audio id="coin-sound" src="coin-music.mp3" preload="auto"></audio>
+  <audio id="bg-music" src="bg-music.mp3" loop preload="auto"></audio>
+  
   <script>
     // Игровые переменные
     let balance = localStorage.getItem('tapBalance') ? parseInt(localStorage.getItem('tapBalance')) : 0;
@@ -290,18 +474,45 @@
     const maxEnergy = 1000;
     let lastTapTime = 0;
     let tapCount = 0;
-    let cps = 0;
     let lastUpdateTime = Date.now();
     let hourIncome = 0; // Переменная для дохода в час
+    
+    // Настройки
+    let settings = {
+      vibration: localStorage.getItem('vibration') !== 'false',
+      sound: localStorage.getItem('sound') !== 'false',
+      backgroundIncome: localStorage.getItem('backgroundIncome') !== 'false',
+      bgMusic: localStorage.getItem('bgMusic') !== 'false',
+      volume: localStorage.getItem('volume') ? parseFloat(localStorage.getItem('volume')) : 0.3
+    };
     
     // Элементы интерфейса
     const balanceElement = document.getElementById('balance');
     const energyBar = document.getElementById('energy-bar');
     const energyText = document.getElementById('energy-text');
     const coin = document.getElementById('coin');
-    const cpsElement = document.getElementById('cps');
     const hourIncomeElement = document.getElementById('hour-income');
     const navItems = document.querySelectorAll('.nav-item');
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const closeSettings = document.getElementById('close-settings');
+    const vibrationToggle = document.getElementById('vibration-toggle');
+    const soundToggle = document.getElementById('sound-toggle');
+    const bgMusicToggle = document.getElementById('bg-music-toggle');
+    const backgroundIncomeToggle = document.getElementById('background-income-toggle');
+    const volumeSlider = document.getElementById('volume-slider');
+    
+    // Аудио элементы
+    const coinSound = document.getElementById('coin-sound');
+    const bgMusic = document.getElementById('bg-music');
+    
+    // Инициализация настроек
+    vibrationToggle.checked = settings.vibration;
+    soundToggle.checked = settings.sound;
+    bgMusicToggle.checked = settings.bgMusic;
+    backgroundIncomeToggle.checked = settings.backgroundIncome;
+    volumeSlider.value = settings.volume * 100;
+    bgMusic.volume = settings.volume;
     
     // Навигация
     navItems.forEach(item => {
@@ -311,6 +522,50 @@
         this.classList.add('active');
         // Здесь можно добавить логику переключения экранов
       });
+    });
+    
+    // Открытие/закрытие настроек
+    settingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'flex';
+    });
+    
+    closeSettings.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+    
+    // Обработка переключателей
+    vibrationToggle.addEventListener('change', function() {
+      settings.vibration = this.checked;
+      localStorage.setItem('vibration', this.checked);
+    });
+    
+    soundToggle.addEventListener('change', function() {
+      settings.sound = this.checked;
+      localStorage.setItem('sound', this.checked);
+    });
+    
+    bgMusicToggle.addEventListener('change', function() {
+      settings.bgMusic = this.checked;
+      localStorage.setItem('bgMusic', this.checked);
+      
+      if (this.checked) {
+        bgMusic.play().catch(e => console.log("Автовоспроизведение заблокировано"));
+      } else {
+        bgMusic.pause();
+      }
+    });
+    
+    backgroundIncomeToggle.addEventListener('change', function() {
+      settings.backgroundIncome = this.checked;
+      localStorage.setItem('backgroundIncome', this.checked);
+    });
+    
+    // Регулировка громкости
+    volumeSlider.addEventListener('input', function() {
+      const volume = this.value / 100;
+      settings.volume = volume;
+      bgMusic.volume = volume;
+      localStorage.setItem('volume', volume);
     });
     
     // Восстановление энергии при возврате на вкладку
@@ -323,7 +578,14 @@
     // Инициализация
     updateUI();
     startEnergyRecovery();
-    startCPSCalculator();
+    
+    // Автовоспроизведение фоновой музыки
+    if (settings.bgMusic) {
+      document.addEventListener('click', function initMusic() {
+        bgMusic.play().catch(e => console.log("Автовоспроизведение заблокировано"));
+        document.removeEventListener('click', initMusic);
+      }, { once: true });
+    }
     
     // Обработка клика
     coin.addEventListener('click', (e) => {
@@ -340,21 +602,22 @@
         createClickEffect(e);
         createPlusOne(e);
         
+        // Вибрация (если включена)
+        if (settings.vibration && navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+        
+        // Звук монеты (если включен)
+        if (settings.sound) {
+          coinSound.currentTime = 0;
+          coinSound.play().catch(e => console.log("Звук не воспроизведен"));
+        }
+        
         // Анимация монеты
         animateCoin(e);
         
         // Обновление интерфейса
         updateUI();
-        
-        // Подсчет CPS
-        tapCount++;
-        const now = Date.now();
-        if (now - lastTapTime > 1000) {
-          cps = Math.round(tapCount / ((now - lastTapTime) / 1000));
-          cpsElement.textContent = `${cps} кликов/сек`;
-          tapCount = 0;
-          lastTapTime = now;
-        }
       }
     });
     
@@ -400,19 +663,6 @@
       }
       
       lastUpdateTime = now;
-    }
-    
-    // Подсчет CPS
-    function startCPSCalculator() {
-      setInterval(() => {
-        const now = Date.now();
-        if (now - lastTapTime > 2000 && tapCount > 0) {
-          cps = Math.round(tapCount / ((now - lastTapTime) / 1000));
-          cpsElement.textContent = `${cps} кликов/сек`;
-          tapCount = 0;
-          lastTapTime = now;
-        }
-      }, 500);
     }
     
     // Эффект клика
