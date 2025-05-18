@@ -1,1047 +1,1461 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Меллстрой Тапалка</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
-    
-    body {
-      font-family: 'Rubik', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #0f0f23 url('stream-bg.png') center/cover;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-      user-select: none;
-      padding-bottom: 70px;
-    }
-    
-    .header {
-      text-align: center;
-      margin-top: 20px;
-      width: 100%;
-      position: relative;
-    }
-    
-    .settings-btn {
-      position: absolute;
-      right: 20px;
-      top: 10px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 10;
-      color: #9147ff;
-      transition: transform 0.3s;
-    }
-    
-    .settings-btn:hover {
-      transform: rotate(30deg);
-    }
-    
-    .balance-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 20px;
-      padding: 10px 20px;
-      border: 1px solid #9147ff;
-      box-shadow: 0 0 15px rgba(145, 71, 255, 0.4);
-      margin: 10px 0;
-    }
-    
-    .balance {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #9147ff;
-      text-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
-      position: relative;
-      transition: all 0.1s;
-    }
-    
-    .balance-counter {
-      position: absolute;
-      right: -30px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1rem;
-      color: #00ff88;
-      opacity: 0;
-      transition: all 0.5s;
-    }
-    
-    .energy-container {
-      width: 80%;
-      max-width: 300px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 5px;
-      margin: 10px 0;
-      border: 1px solid #9147ff;
-      box-shadow: 0 0 10px rgba(145, 71, 255, 0.3);
-    }
-    
-    .energy-bar {
-      height: 20px;
-      background: linear-gradient(90deg, #9147ff, #772ce8);
-      border-radius: 8px;
-      width: 100%;
-      transition: width 0.3s;
-    }
-    
-    .energy-text {
-      text-align: center;
-      margin-top: 5px;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .income-container {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      padding: 10px 20px;
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: 1px solid #9147ff;
-      box-shadow: 0 0 10px rgba(145, 71, 255, 0.3);
-    }
-    
-    .income-title {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .income-value {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #9147ff;
-    }
-    
-    .income-plus {
-      color: #00ff88;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    
-    .coin-container {
-      margin: 10px 0;
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      width: 100%;
-    }
-    
-    .coin {
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle at center, #FFD700, #D4AF37);
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-      z-index: 2;
-    }
-    
-    .coin-inner {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .streamer {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: relative;
-    }
-    
-    .glow {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      box-shadow: 0 0 15px 5px rgba(145, 71, 255, 0.7);
-      animation: pulse 2s infinite alternate;
-    }
-    
-    @keyframes pulse {
-      0% { box-shadow: 0 0 10px 3px rgba(145, 71, 255, 0.5); }
-      100% { box-shadow: 0 0 20px 8px rgba(145, 71, 255, 0.9); }
-    }
-    
-    .click-effect {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background: rgba(145, 71, 255, 0.7);
-      border-radius: 50%;
-      pointer-events: none;
-      animation: clickAnim 0.5s forwards;
-    }
-    
-    .plus-one {
-      position: absolute;
-      font-size: 1.5rem;
-      color: #9147ff;
-      font-weight: bold;
-      pointer-events: none;
-      animation: floatUp 1s forwards;
-      opacity: 0;
-      z-index: 100;
-      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    }
-    
-    @keyframes clickAnim {
-      0% { transform: scale(0); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
-    }
-    
-    @keyframes floatUp {
-      0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(-50px); opacity: 0; }
-    }
-    
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-sizing: border-box;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-    
-    .modal.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #9147ff;
-      padding-bottom: 10px;
-    }
-    
-    .modal-title {
-      font-size: 1.5rem;
-      color: #9147ff;
-    }
-    
-    .close-modal {
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #9147ff;
-      transition: transform 0.3s;
-    }
-    
-    .close-modal:hover {
-      transform: scale(1.2);
-    }
-    
-    .modal-content {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #9147ff;
-    }
-    
-    .modal-placeholder {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 1rem;
-      border: 2px dashed rgba(145, 71, 255, 0.3);
-      border-radius: 10px;
-    }
-    
-    .modal-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    
-    .control-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-    }
-    
-    .control-label {
-      font-size: 1rem;
-    }
-    
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-    }
-    
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-    
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-      background-color: #9147ff;
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-    
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      border-top: 1px solid #9147ff;
-      z-index: 100;
-    }
-    
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-      text-decoration: none;
-      font-size: 0.8rem;
-      padding: 5px 10px;
-      transition: all 0.3s;
-    }
-    
-    .nav-item.active {
-      color: #9147ff;
-      transform: translateY(-5px);
-    }
-    
-    .nav-icon {
-      font-size: 1.5rem;
-      margin-bottom: 3px;
-    }
-    
-    .side-button {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 1;
-      border: 2px solid #9147ff;
-      transition: all 0.3s;
-      box-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
-    }
-    
-    .side-button:hover {
-      transform: scale(1.1);
-      background: rgba(145, 71, 255, 0.3);
-    }
-    
-    .ton-button {
-      left: 20%;
-      bottom: 30%;
-      background: linear-gradient(135deg, #9147ff, #772ce8);
-    }
-    
-    .lightning-button {
-      right: 20%;
-      bottom: 30%;
-      background: linear-gradient(135deg, #9147ff, #772ce8);
-    }
-    
-    .ton-icon {
-      width: 30px;
-      height: 30px;
-      background-image: url('ton-icon.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    
-    .upgrade-option {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #9147ff;
-    }
-    
-    .upgrade-info {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .upgrade-name {
-      font-size: 1.1rem;
-      margin-bottom: 5px;
-      color: white;
-    }
-    
-    .upgrade-level {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .upgrade-cost {
-      font-weight: bold;
-      color: #9147ff;
-    }
-    
-    .upgrade-button {
-      background: linear-gradient(135deg, #9147ff, #772ce8);
-      border: none;
-      color: white;
-      padding: 8px 15px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    
-    .upgrade-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
-    }
-    
-    .upgrade-button:disabled {
-      background: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.5);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .connect-wallet-btn {
-      background: linear-gradient(135deg, #9147ff, #772ce8);
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 30px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: all 0.3s;
-    }
-    
-    .connect-wallet-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(145, 71, 255, 0.5);
-    }
-    
-    .error-message {
-      color: #ff5555;
-      margin-top: 15px;
-      display: none;
-    }
-    
-    @media (max-width: 600px) {
-      .balance {
-        font-size: 2rem;
-      }
-      
-      .coin {
-        width: 180px;
-        height: 180px;
-      }
-      
-      .coin-inner {
-        width: 140px;
-        height: 140px;
-      }
-      
-      .side-button {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-      }
-      
-      .ton-button {
-        left: 15%;
-      }
-      
-      .lightning-button {
-        right: 15%;
-      }
-    }
-  </style>
+    <title>Меллстрой Тапалка</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #0f0f23 url('stream-bg.png') center/cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            user-select: none;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            text-align: center;
+            margin-top: 20px;
+            width: 100%;
+            position: relative;
+        }
+
+        .settings-btn {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            color: #9147ff;
+            transition: transform 0.3s;
+        }
+
+        .settings-btn:hover {
+            transform: rotate(30deg);
+        }
+
+        .balance-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: 1px solid #9147ff;
+            box-shadow: 0 0 15px rgba(145, 71, 255, 0.4);
+            margin: 10px 0;
+        }
+
+        .balance {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #9147ff;
+            text-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
+            position: relative;
+            transition: all 0.1s;
+        }
+
+        .balance-counter {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #00ff88;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+
+        .energy-container {
+            width: 80%;
+            max-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+            margin: 10px 0;
+            border: 1px solid #9147ff;
+            box-shadow: 0 0 10px rgba(145, 71, 255, 0.3);
+        }
+
+        .energy-bar {
+            height: 20px;
+            background: linear-gradient(90deg, #9147ff, #772ce8);
+            border-radius: 8px;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        .energy-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .income-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid #9147ff;
+            box-shadow: 0 0 10px rgba(145, 71, 255, 0.3);
+        }
+
+        .income-title {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .income-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #9147ff;
+        }
+
+        .income-plus {
+            color: #00ff88;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .coin-container {
+            margin: 10px 0;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+        }
+
+        .coin {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at center, #FFD700, #D4AF37);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .streamer {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+        }
+
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 5px rgba(145, 71, 255, 0.7);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 10px 3px rgba(145, 71, 255, 0.5);
+            }
+
+            100% {
+                box-shadow: 0 0 20px 8px rgba(145, 71, 255, 0.9);
+            }
+        }
+
+        .click-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(145, 71, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: clickAnim 0.5s forwards;
+        }
+
+        .plus-one {
+            position: absolute;
+            font-size: 1.5rem;
+            color: #9147ff;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 1s forwards;
+            opacity: 0;
+            z-index: 100;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes clickAnim {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #9147ff;
+            padding-bottom: 10px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #9147ff;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9147ff;
+            transition: transform 0.3s;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #9147ff;
+        }
+
+        .modal-placeholder {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1rem;
+            border: 2px dashed rgba(145, 71, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .modal-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .control-label {
+            font-size: 1rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #9147ff;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #9147ff;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #9147ff;
+            transform: translateY(-5px);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 3px;
+        }
+
+        .side-button {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1;
+            border: 2px solid #9147ff;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
+        }
+
+        .side-button:hover {
+            transform: scale(1.1);
+            background: rgba(145, 71, 255, 0.3);
+        }
+
+        .ton-button {
+            left: 20%;
+            bottom: 30%;
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+        }
+
+        .lightning-button {
+            right: 20%;
+            bottom: 30%;
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+        }
+
+        .ton-icon {
+            width: 30px;
+            height: 30px;
+            background-image: url('ton-icon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .upgrade-option {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #9147ff;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upgrade-name {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .upgrade-level {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .upgrade-cost {
+            font-weight: bold;
+            color: #9147ff;
+        }
+
+        .upgrade-button {
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .upgrade-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(145, 71, 255, 0.5);
+        }
+
+        .upgrade-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .connect-wallet-btn {
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .connect-wallet-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(145, 71, 255, 0.5);
+        }
+
+        .error-message {
+            color: #ff5555;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .upgrade-bg {
+            background: url('upgrade-bg.jpg') center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .upgrade-message {
+            font-size: 1.5rem;
+            color: #9147ff;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 1px solid #9147ff;
+        }
+
+        /* Новые стили для друзей */
+        .social-stats {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px;
+            border: 1px solid #9147ff;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .invite-button {
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .invite-button:hover {
+            transform: scale(1.05);
+        }
+
+        .friends-list {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .friend-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(145, 71, 255, 0.3);
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .friend-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friend-name {
+            color: #9147ff;
+            font-weight: bold;
+        }
+
+        .friend-income {
+            color: #00ff88;
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }
+
+        /* Вкладки */
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #9147ff;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #9147ff;
+            border-bottom: 3px solid #9147ff;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Страницы */
+        .page {
+            display: none;
+            width: 100%;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* Новые стили для страницы улучшений */
+        #upgrades-page {
+            background: url('upgrade-bg.jpg') center/cover;
+        }
+
+        .upgrade-type-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-type-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9147ff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upgrade-type-button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        @media (max-width: 600px) {
+            .balance {
+                font-size: 2rem;
+            }
+
+            .coin {
+                width: 180px;
+                height: 180px;
+            }
+
+            .coin-inner {
+                width: 140px;
+                height: 140px;
+            }
+
+            .side-button {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .ton-button {
+                left: 15%;
+            }
+
+            .lightning-button {
+                right: 15%;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="header">
-    <div class="settings-btn" id="settings-btn">⚙️</div>
-    <div class="balance-container">
-      <div class="balance" id="balance">0</div>
-      <div class="balance-counter" id="balance-counter">+0</div>
-    </div>
-  </div>
-  
-  <div class="energy-container">
-    <div class="energy-bar" id="energy-bar"></div>
-    <div class="energy-text" id="energy-text">1000 / 1000</div>
-  </div>
-  
-  <div class="income-container">
-    <div class="income-title">ДОХОД В ЧАС</div>
-    <div class="income-value" id="hour-income">0</div>
-    <div class="income-plus">+</div>
-  </div>
-  
-  <div class="coin-container">
-    <div class="side-button ton-button" id="ton-button">
-      <div class="ton-icon"></div>
-    </div>
-    <div class="side-button lightning-button" id="lightning-button">⚡</div>
-    <div class="coin" id="coin">
-      <div class="coin-inner">
-        <img src="streamer.png" class="streamer" alt="Меллстрой">
-        <div class="glow"></div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Settings Modal -->
-  <div class="modal" id="settings-modal">
-    <div class="modal-header">
-      <div class="modal-title">Настройки</div>
-      <div class="close-modal" id="close-settings">✕</div>
-    </div>
-    
-    <div class="modal-content">
-      <div class="modal-title">Скины</div>
-      <div class="modal-placeholder">В разработке</div>
-    </div>
-    
-    <div class="modal-controls">
-      <div class="control-item">
-        <span class="control-label">Вибрация</span>
-        <label class="switch">
-          <input type="checkbox" id="vibration-toggle" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-      
-      <div class="control-item">
-        <span class="control-label">Фоновый доход</span>
-        <label class="switch">
-          <input type="checkbox" id="background-income-toggle" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Upgrade Modal -->
-  <div class="modal" id="upgrade-modal">
-    <div class="modal-header">
-      <div class="modal-title">Улучшения</div>
-      <div class="close-modal" id="close-upgrade">✕</div>
-    </div>
-    
-    <div class="modal-content">
-      <div class="upgrade-option">
-        <div class="upgrade-info">
-          <div class="upgrade-name">Монеты за клики</div>
-          <div class="upgrade-level">Уровень: <span id="click-level">1</span></div>
+    <!-- Главная страница -->
+    <div class="page active" id="main-page">
+        <div class="header">
+            <div class="settings-btn" id="settings-btn">⚙️</div>
+            <div class="balance-container">
+                <div class="balance" id="balance">0</div>
+                <div class="balance-counter" id="balance-counter">+0</div>
+            </div>
         </div>
-        <button class="upgrade-button" id="upgrade-click">2000</button>
-      </div>
-      
-      <div class="upgrade-option">
-        <div class="upgrade-info">
-          <div class="upgrade-name">Скорость восстановления</div>
-          <div class="upgrade-level">Уровень: <span id="recovery-level">1</span></div>
+
+        <div class="energy-container">
+            <div class="energy-bar" id="energy-bar"></div>
+            <div class="energy-text" id="energy-text">1000 / 1000</div>
         </div>
-        <button class="upgrade-button" id="upgrade-recovery">2000</button>
-      </div>
-      
-      <div class="upgrade-option">
-        <div class="upgrade-info">
-          <div class="upgrade-name">Энергия</div>
-          <div class="upgrade-level">Уровень: <span id="energy-level">1</span></div>
+
+        <div class="income-container">
+            <div class="income-title">ДОХОД В ЧАС</div>
+            <div class="income-value" id="hour-income">0</div>
+            <div class="income-plus" id="income-plus">+</div>
         </div>
-        <button class="upgrade-button" id="upgrade-energy">2000</button>
-      </div>
+
+        <div class="coin-container">
+            <div class="side-button ton-button" id="ton-button">
+                <div class="ton-icon"></div>
+            </div>
+            <div class="side-button lightning-button" id="lightning-button">⚡</div>
+            <div class="coin" id="coin">
+                <img src="streamer.png" class="streamer" alt="Меллстрой">
+                <div class="glow"></div>
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <!-- Wallet Modal -->
-  <div class="modal" id="wallet-modal">
-    <div class="modal-header">
-      <div class="modal-title">Подключение кошелька</div>
-      <div class="close-modal" id="close-wallet">✕</div>
+
+    <!-- Страница улучшений -->
+    <div class="page" id="upgrades-page">
+        <div class="header">
+            <div class="settings-btn" id="settings-btn-upgrades">⚙️</div>
+            <div class="balance-container">
+                <div class="balance" id="balance-upgrades">0</div>
+            </div>
+        </div>
+
+        <div class="upgrade-type-buttons">
+            <div class="upgrade-type-button" id="ordinary-upgrades-btn">Обычные</div>
+            <div class="upgrade-type-button" id="special-upgrades-btn">Особые</div>
+        </div>
+
+        <div class="modal-placeholder" style="margin-top: 20px;">
+            Улучшения пока в разработке
+        </div>
     </div>
-    <div class="modal-content">
-      <div class="wallet-title">Подключение кошелька</div>
-      <p>Подключите свой TON кошелек для получения бонусов</p>
-      <button class="connect-wallet-btn" id="connect-wallet-btn">Подключить кошелек</button>
-      <div class="error-message" id="wallet-error">ПОКА В РАЗРАБОТКЕ</div>
+
+    <!-- Страница онлайн -->
+    <div class="page" id="online-page">
+        <div class="header">
+            <div class="settings-btn" id="settings-btn-online">⚙️</div>
+            <div class="balance-container">
+                <div class="balance" id="balance-online">0</div>
+            </div>
+        </div>
+        <div class="modal-placeholder" style="margin-top: 20px;">
+            Активные стримы пока в разработке
+        </div>
     </div>
-  </div>
-  
-  <div class="bottom-nav">
-    <a href="#" class="nav-item active">
-      <span class="nav-icon">🏠</span>
-      <span>Главная</span>
-    </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">⚡</span>
-      <span>Улучшения</span>
-    </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">🌐</span>
-      <span>Онлайн</span>
-    </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">👥</span>
-      <span>Друзья</span>
-    </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">🎯</span>
-      <span>Задания</span>
-    </a>
-  </div>
-  
-  <script>
-    let balance = localStorage.getItem('tapBalance') ? parseInt(localStorage.getItem('tapBalance')) : 0;
-    let energy = localStorage.getItem('tapEnergy') ? parseInt(localStorage.getItem('tapEnergy')) : 1000;
-    let maxEnergy = localStorage.getItem('maxEnergy') ? parseInt(localStorage.getItem('maxEnergy')) : 1000;
-    let lastTapTime = 0;
-    let tapCount = 0;
-    let lastUpdateTime = localStorage.getItem('lastUpdateTime') ? parseInt(localStorage.getItem('lastUpdateTime')) : Date.now();
-    let hourIncome = 0;
-    let backgroundTime = null;
-    let lastBalance = balance;
-    let isCounting = false;
-    
-    let upgrades = {
-      click: localStorage.getItem('clickLevel') ? parseInt(localStorage.getItem('clickLevel')) : 1,
-      recovery: localStorage.getItem('recoveryLevel') ? parseInt(localStorage.getItem('recoveryLevel')) : 1,
-      energy: localStorage.getItem('energyLevel') ? parseInt(localStorage.getItem('energyLevel')) : 1
-    };
-    
-    const upgradeCosts = {
-      click: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000],
-      recovery: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000],
-      energy: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000]
-    };
-    
-    const upgradeValues = {
-      click: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      recovery: [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.3, 0.3],
-      energy: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
-    };
-    
-    let settings = {
-      vibration: localStorage.getItem('vibration') !== 'false',
-      backgroundIncome: localStorage.getItem('backgroundIncome') !== 'false'
-    };
-    
-    const balanceElement = document.getElementById('balance');
-    const balanceCounter = document.getElementById('balance-counter');
-    const energyBar = document.getElementById('energy-bar');
-    const energyText = document.getElementById('energy-text');
-    const coin = document.getElementById('coin');
-    const hourIncomeElement = document.getElementById('hour-income');
-    const navItems = document.querySelectorAll('.nav-item');
-    const settingsBtn = document.getElementById('settings-btn');
-    const settingsModal = document.getElementById('settings-modal');
-    const closeSettings = document.getElementById('close-settings');
-    const vibrationToggle = document.getElementById('vibration-toggle');
-    const backgroundIncomeToggle = document.getElementById('background-income-toggle');
-    const tonButton = document.getElementById('ton-button');
-    const lightningButton = document.getElementById('lightning-button');
-    const walletModal = document.getElementById('wallet-modal');
-    const connectWalletBtn = document.getElementById('connect-wallet-btn');
-    const walletError = document.getElementById('wallet-error');
-    const closeWallet = document.getElementById('close-wallet');
-    const upgradeModal = document.getElementById('upgrade-modal');
-    const closeUpgrade = document.getElementById('close-upgrade');
-    const clickLevelElement = document.getElementById('click-level');
-    const recoveryLevelElement = document.getElementById('recovery-level');
-    const energyLevelElement = document.getElementById('energy-level');
-    const upgradeClickBtn = document.getElementById('upgrade-click');
-    const upgradeRecoveryBtn = document.getElementById('upgrade-recovery');
-    const upgradeEnergyBtn = document.getElementById('upgrade-energy');
-    
-    vibrationToggle.checked = settings.vibration;
-    backgroundIncomeToggle.checked = settings.backgroundIncome;
-    
+
+    <!-- Страница друзей -->
+    <div class="page" id="friends-page">
+        <div class="header">
+            <div class="settings-btn" id="settings-btn-friends">⚙️</div>
+            <div class="balance-container">
+                <div class="balance" id="balance-friends">0</div>
+            </div>
+        </div>
+
+        <div class="social-stats">
+            <div class="stat-item">
+                <span>Всего друзей:</span>
+                <span id="total-friends">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Доход от друзей:</span>
+                <span id="friends-income">0</span>
+            </div>
+        </div>
+
+        <button class="invite-button" id="invite-button">Пригласить друга</button>
+
+        <div class="friends-list" id="friends-list">
+            <!-- Список друзей будет здесь -->
+        </div>
+    </div>
+
+    <!-- Страница заданий -->
+    <div class="page" id="tasks-page">
+        <div class="header">
+            <div class="settings-btn" id="settings-btn-tasks">⚙️</div>
+            <div class="balance-container">
+                <div class="balance" id="balance-tasks">0</div>
+            </div>
+        </div>
+        <div class="modal-placeholder" style="margin-top: 20px;">
+            Задания пока в разработке
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-header">
+            <div class="modal-title">Настройки</div>
+            <div class="close-modal" id="close-settings">✕</div>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-title">Скины</div>
+            <div class="modal-placeholder">В разработке</div>
+        </div>
+
+        <div class="modal-controls">
+            <div class="control-item">
+                <span class="control-label">Вибрация</span>
+                <label class="switch">
+                    <input type="checkbox" id="vibration-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="control-item">
+                <span class="control-label">Фоновый доход</span>
+                <label class="switch">
+                    <input type="checkbox" id="background-income-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно кошелька -->
+    <div class="modal" id="wallet-modal">
+        <div class="modal-header">
+            <div class="modal-title">Подключение кошелька</div>
+            <div class="close-modal" id="close-wallet">✕</div>
+        </div>
+        <div class="modal-content">
+            <div class="wallet-title">Подключение кошелька</div>
+            <p>Подключите свой TON кошелек для получения бонусов</p>
+            <button class="connect-wallet-btn" id="connect-wallet-btn">Подключить кошелек</button>
+            <div class="error-message" id="wallet-error">ПОКА В РАЗРАБОТКЕ</div>
+        </div>
+    </div>
+
+    <!-- Модальное окно улучшений (клик) -->
+    <div class="modal" id="click-upgrades-modal">
+        <div class="modal-header">
+            <div class="modal-title">Улучшения кликов</div>
+            <div class="close-modal" id="close-click-upgrades">✕</div>
+        </div>
+        <div class="modal-content">
+            <div class="upgrade-option">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Сила клика</div>
+                    <div class="upgrade-level">Уровень: <span id="click-level">1</span></div>
+                </div>
+                <button class="upgrade-button" id="upgrade-click">2000</button>
+            </div>
+
+            <div class="upgrade-option">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Скорость восстановления</div>
+                    <div class="upgrade-level">Уровень: <span id="recovery-level">1</span></div>
+                </div>
+                <button class="upgrade-button" id="upgrade-recovery">2000</button>
+            </div>
+
+            <div class="upgrade-option">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Энергия</div>
+                    <div class="upgrade-level">Уровень: <span id="energy-level">1</span></div>
+                </div>
+                <button class="upgrade-button" id="upgrade-energy">2000</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item" data-page="main-page">
+            <span class="nav-icon">🏠</span>
+            <span>Главная</span>
+        </a>
+        <a href="#" class="nav-item" data-page="upgrades-page">
+            <span class="nav-icon">⚡</span>
+            <span>Улучшения</span>
+        </a>
+        <a href="#" class="nav-item" data-page="online-page">
+            <span class="nav-icon">🌐</span>
+            <span>Онлайн</span>
+        </a>
+        <a href="#" class="nav-item" data-page="friends-page">
+            <span class="nav-icon">👥</span>
+            <span>Друзья</span>
+        </a>
+        <a href="#" class="nav-item" data-page="tasks-page">
+            <span class="nav-icon">🎯</span>
+            <span>Задания</span>
+        </a>
+    </div>
+
+    <script>
+        let balance = localStorage.getItem('tapBalance') ? parseInt(localStorage.getItem('tapBalance')) : 0;
+        let energy = localStorage.getItem('tapEnergy') ? parseInt(localStorage.getItem('tapEnergy')) : 1000;
+        let maxEnergy = localStorage.getItem('maxEnergy') ? parseInt(localStorage.getItem('maxEnergy')) : 1000;
+        let lastTapTime = 0;
+        let tapCount = 0;
+        let lastUpdateTime = localStorage.getItem('lastUpdateTime') ? parseInt(localStorage.getItem('lastUpdateTime')) : Date.now();
+        let hourIncome = 0;
+        let backgroundTime = null;
+        let lastBalance = balance;
+        let isCounting = false;
+
+        let upgrades = {
+            click: localStorage.getItem('clickLevel') ? parseInt(localStorage.getItem('clickLevel')) : 1,
+            recovery: localStorage.getItem('recoveryLevel') ? parseInt(localStorage.getItem('recoveryLevel')) : 1,
+            energy: localStorage.getItem('energyLevel') ? parseInt(localStorage.getItem('energyLevel')) : 1
+        };
+
+        const upgradeCosts = {
+            click: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000],
+            recovery: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000],
+            energy: [2000, 4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000]
+        };
+
+        const upgradeValues = {
+            click: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            recovery: [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.3, 0.3],
+            energy: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+        };
+
+        let settings = {
+            vibration: localStorage.getItem('vibration') !== 'false',
+            backgroundIncome: localStorage.getItem('backgroundIncome') !== 'false'
+        };
+
+        // Социальные данные
+        let socialData = {
+            referralLink: localStorage.getItem('referralLink') || generateReferralLink(),
+            friendsList: JSON.parse(localStorage.getItem('friendsList')) || [],
+            seasonEndDate: "2024-12-31",
+            isExistingPlayer: localStorage.getItem('isExistingPlayer') === 'true'
+        };
+
+        // Элементы DOM
+        const balanceElement = document.getElementById('balance');
+        const balanceCounter = document.getElementById('balance-counter');
+        const energyBar = document.getElementById('energy-bar');
+        const energyText = document.getElementById('energy-text');
+        const coin = document.getElementById('coin');
+        const hourIncomeElement = document.getElementById('hour-income');
+        const incomePlus = document.getElementById('income-plus');
+        const navItems = document.querySelectorAll('.nav-item');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettings = document.getElementById('close-settings');
+        const vibrationToggle = document.getElementById('vibration-toggle');
+        const backgroundIncomeToggle = document.getElementById('background-income-toggle');
+        const tonButton = document.getElementById('ton-button');
+        const lightningButton = document.getElementById('lightning-button');
+        const walletModal = document.getElementById('wallet-modal');
+        const connectWalletBtn = document.getElementById('connect-wallet-btn');
+        const walletError = document.getElementById('wallet-error');
+        const closeWallet = document.getElementById('close-wallet');
+        const clickUpgradesModal = document.getElementById('click-upgrades-modal');
+        const closeClickUpgrades = document.getElementById('close-click-upgrades');
+        const pages = document.querySelectorAll('.page');
+        const upgradesPage = document.getElementById('upgrades-page');
+        const ordinaryUpgradesBtn = document.getElementById('ordinary-upgrades-btn');
+        const specialUpgradesBtn = document.getElementById('special-upgrades-btn');
+        const inviteButton = document.getElementById('invite-button');
+
+        // Элементы для улучшений
+        const clickLevelElement = document.getElementById('click-level');
+        const upgradeClickBtn = document.getElementById('upgrade-click');
+        const upgradeRecoveryBtn = document.getElementById('upgrade-recovery');
+        const upgradeEnergyBtn = document.getElementById('upgrade-energy');
+        const recoveryLevelElement = document.getElementById('recovery-level');
+        const energyLevelElement = document.getElementById('energy-level');
+
+        vibrationToggle.checked = settings.vibration;
+        backgroundIncomeToggle.checked = settings.backgroundIncome;
+
+        // Генерация реферальной ссылки
+        function generateReferralLink() {
+            const nickname = localStorage.getItem('nickname') || `Игрок${Math.floor(Math.random() * 1000)}`;
+            localStorage.setItem('nickname', nickname);
+            return `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(nickname)}`;
+        }
+
+        // Генерация аватарки
+        function generateAvatar(nickname) {
+            const colors = ['#9147ff', '#772ce8', '#ff5555', '#00ff88', '#FFD700'];
+            const letter = nickname.charAt(0).toUpperCase();
+            const colorIndex = nickname.length % colors.length;
+            return { letter, color: colors[colorIndex] };
+        }
+
+        // Проверка реферального кода при загрузке
+        function checkReferralOnLoad() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+
+            // Если игрок уже существует (играл раньше)
+            if (localStorage.getItem('isExistingPlayer')) {
+                console.log("Этот игрок уже существует, бонус не начисляется");
+                return;
+            }
+
+            // Если это новый игрок и есть реферальный код
+            if (refCode && !socialData.friendsList.some(f => f.id === refCode)) {
+                // Добавляем в список друзей
+                socialData.friendsList.push({
+                    id: refCode,
+                    nickname: decodeURIComponent(refCode),
+                    avatar: generateAvatar(decodeURIComponent(refCode)),
+                    joinedDate: new Date().toISOString()
+                });
+                
+                localStorage.setItem('friendsList', JSON.stringify(socialData.friendsList));
+                
+                // Начисляем 20000 монет пригласившему
+                balance += 20000;
+                localStorage.setItem('tapBalance', balance);
+                updateAllBalances();
+                
+                console.log(`Игрок ${refCode} пригласил нового пользователя! +20000 монет`);
+                
+                // Помечаем игрока как существующего
+                localStorage.setItem('isExistingPlayer', 'true');
+            }
+
+            // Для всех новых игроков
+            if (!localStorage.getItem('isExistingPlayer')) {
+                localStorage.setItem('isExistingPlayer', 'true');
+            }
+        }
+
+        // Обновление UI друзей
+        function updateFriendsUI() {
+            const friendsListElement = document.getElementById('friends-list');
+            friendsListElement.innerHTML = '';
+
+            socialData.friendsList.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                friendElement.innerHTML = `
+                    <div class="friend-avatar" style="background-color: ${friend.avatar.color}">
+                        ${friend.avatar.letter}
+                    </            </div>
+            <div class="friend-info">
+                <span class="friend-name">${friend.nickname}</span>
+                <span class="friend-income">+${20000 + (500 * 5)} монет</span>
+            </div>
+            `;
+            friendsListElement.appendChild(friendElement);
+        });
+
+        document.getElementById('total-friends').textContent = socialData.friendsList.length;
+        document.getElementById('friends-income').textContent = socialData.friendsList.length * (20000 + (500 * 5));
+    }
+
+    // Обработчик кнопки приглашения
+    inviteButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(socialData.referralLink)
+            .then(() => alert(`Ссылка скопирована: ${socialData.referralLink}\nОтправь её друзьям!`))
+            .catch(() => prompt("Скопируйте эту ссылку вручную:", socialData.referralLink));
+    });
+
+    // Инициализация улучшений
     function initUpgrades() {
-      maxEnergy = upgradeValues.energy[upgrades.energy - 1];
-      energy = Math.min(energy, maxEnergy);
-      
-      clickLevelElement.textContent = upgrades.click;
-      recoveryLevelElement.textContent = upgrades.recovery;
-      energyLevelElement.textContent = upgrades.energy;
-      
-      updateUpgradeButtons();
-    }
-    
-    function updateUpgradeButtons() {
-      if (upgrades.click < 10) {
-        upgradeClickBtn.textContent = upgradeCosts.click[upgrades.click - 1];
-        upgradeClickBtn.disabled = balance < upgradeCosts.click[upgrades.click - 1];
-      } else {
-        upgradeClickBtn.textContent = "MAX";
-        upgradeClickBtn.disabled = true;
-      }
-      
-      if (upgrades.recovery < 8) {
-        upgradeRecoveryBtn.textContent = upgradeCosts.recovery[upgrades.recovery - 1];
-        upgradeRecoveryBtn.disabled = balance < upgradeCosts.recovery[upgrades.recovery - 1];
-      } else {
-        upgradeRecoveryBtn.textContent = "MAX";
-        upgradeRecoveryBtn.disabled = true;
-      }
-      
-      if (upgrades.energy < 10) {
-        upgradeEnergyBtn.textContent = upgradeCosts.energy[upgrades.energy - 1];
-        upgradeEnergyBtn.disabled = balance < upgradeCosts.energy[upgrades.energy - 1];
-      } else {
-        upgradeEnergyBtn.textContent = "MAX";
-        upgradeEnergyBtn.disabled = true;
-      }
-    }
-    
-    navItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        navItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-    
-    function openModal(modal) {
-      modal.classList.add('active');
-    }
-    
-    function closeModal(modal) {
-      modal.classList.remove('active');
-    }
-    
-    settingsBtn.addEventListener('click', () => {
-      openModal(settingsModal);
-    });
-    
-    closeSettings.addEventListener('click', () => {
-      closeModal(settingsModal);
-    });
-    
-    vibrationToggle.addEventListener('change', function() {
-      settings.vibration = this.checked;
-      localStorage.setItem('vibration', this.checked);
-    });
-    
-    backgroundIncomeToggle.addEventListener('change', function() {
-      settings.backgroundIncome = this.checked;
-      localStorage.setItem('backgroundIncome', this.checked);
-    });
-    
-    tonButton.addEventListener('click', () => {
-      openModal(walletModal);
-    });
-    
-    lightningButton.addEventListener('click', () => {
-      openModal(upgradeModal);
-      updateUpgradeButtons();
-    });
-    
-    document.querySelectorAll('.close-modal').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const modal = this.closest('.modal');
-        closeModal(modal);
-      });
-    });
-    
-    connectWalletBtn.addEventListener('click', () => {
-      walletError.style.display = 'block';
-      setTimeout(() => {
-        closeModal(walletModal);
-        walletError.style.display = 'none';
-      }, 1500);
-    });
-    
-    upgradeClickBtn.addEventListener('click', () => {
-      const cost = upgradeCosts.click[upgrades.click - 1];
-      if (balance >= cost && upgrades.click < 10) {
-        balance -= cost;
-        upgrades.click++;
-        localStorage.setItem('clickLevel', upgrades.click);
-        localStorage.setItem('tapBalance', balance);
-        clickLevelElement.textContent = upgrades.click;
-        updateUpgradeButtons();
-        updateUI();
-      }
-    });
-    
-    upgradeRecoveryBtn.addEventListener('click', () => {
-      const cost = upgradeCosts.recovery[upgrades.recovery - 1];
-      if (balance >= cost && upgrades.recovery < 8) {
-        balance -= cost;
-        upgrades.recovery++;
-        localStorage.setItem('recoveryLevel', upgrades.recovery);
-        localStorage.setItem('tapBalance', balance);
-        recoveryLevelElement.textContent = upgrades.recovery;
-        updateUpgradeButtons();
-        updateUI();
-      }
-    });
-    
-    upgradeEnergyBtn.addEventListener('click', () => {
-      const cost = upgradeCosts.energy[upgrades.energy - 1];
-      if (balance >= cost && upgrades.energy < 10) {
-        balance -= cost;
-        upgrades.energy++;
         maxEnergy = upgradeValues.energy[upgrades.energy - 1];
-        localStorage.setItem('energyLevel', upgrades.energy);
-        localStorage.setItem('maxEnergy', maxEnergy);
-        localStorage.setItem('tapBalance', balance);
-        localStorage.setItem('tapEnergy', energy);
+        energy = Math.min(energy, maxEnergy);
+        updateUpgradesUI();
+        updateUpgradeButtons();
+    }
+
+    function updateUpgradesUI() {
+        clickLevelElement.textContent = upgrades.click;
+        recoveryLevelElement.textContent = upgrades.recovery;
         energyLevelElement.textContent = upgrades.energy;
         updateUpgradeButtons();
-        updateUI();
-        updateEnergyUI();
-      }
-    });
-    
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        backgroundTime = Date.now();
-      } else {
-        recoverBackgroundEnergy();
-      }
-    });
-    
-    function recoverBackgroundEnergy() {
-      const now = Date.now();
-      let secondsPassed = 0;
-      
-      if (backgroundTime) {
-        secondsPassed = Math.floor((now - backgroundTime) / 1000);
-        backgroundTime = null;
-      } else {
-        secondsPassed = Math.floor((now - lastUpdateTime) / 1000);
-      }
-      
-      if (secondsPassed > 0) {
-        const recoveryRate = upgradeValues.recovery[upgrades.recovery - 1];
-        const effectiveRecoveryRate = document.hidden ? recoveryRate / 2 : recoveryRate;
-        energy = Math.min(energy + secondsPassed * effectiveRecoveryRate, maxEnergy);
-        localStorage.setItem('tapEnergy', energy);
-        updateEnergyUI();
-      }
-      
-      lastUpdateTime = now;
-      localStorage.setItem('lastUpdateTime', lastUpdateTime);
     }
-    
+
+    function updateUpgradeButtons() {
+        if (upgrades.click < 10) {
+            upgradeClickBtn.textContent = upgradeCosts.click[upgrades.click - 1];
+            upgradeClickBtn.disabled = balance < upgradeCosts.click[upgrades.click - 1];
+        } else {
+            upgradeClickBtn.textContent = "MAX";
+            upgradeClickBtn.disabled = true;
+        }
+
+        if (upgrades.recovery < 10) {
+            upgradeRecoveryBtn.textContent = upgradeCosts.recovery[upgrades.recovery - 1];
+            upgradeRecoveryBtn.disabled = balance < upgradeCosts.recovery[upgrades.recovery - 1];
+        } else {
+            upgradeRecoveryBtn.textContent = "MAX";
+            upgradeRecoveryBtn.disabled = true;
+        }
+
+        if (upgrades.energy < 10) {
+            upgradeEnergyBtn.textContent = upgradeCosts.energy[upgrades.energy - 1];
+            upgradeEnergyBtn.disabled = balance < upgradeCosts.energy[upgrades.energy - 1];
+        } else {
+            upgradeEnergyBtn.textContent = "MAX";
+            upgradeEnergyBtn.disabled = true;
+        }
+    }
+
+    // Навигация по страницам
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.getAttribute('data-page');
+
+            navItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            updateAllBalances();
+        });
+    });
+
+    function updateAllBalances() {
+        document.querySelectorAll('.balance').forEach(el => {
+            el.textContent = balance.toLocaleString();
+        });
+    }
+
+    function openModal(modal) {
+        modal.classList.add('active');
+    }
+
+    function closeModal(modal) {
+        modal.classList.remove('active');
+    }
+
+    // Обработчики кнопок
+    settingsBtn.addEventListener('click', () => openModal(settingsModal));
+    document.getElementById('settings-btn-online').addEventListener('click', () => openModal(settingsModal));
+    document.getElementById('settings-btn-friends').addEventListener('click', () => openModal(settingsModal));
+    document.getElementById('settings-btn-tasks').addEventListener('click', () => openModal(settingsModal));
+    document.getElementById('settings-btn-upgrades').addEventListener('click', () => {
+        navItems.forEach(item => item.classList.remove('active'));
+        document.querySelector('[data-page="upgrades-page"]').classList.add('active');
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById('upgrades-page').classList.add('active');
+        updateAllBalances();
+    });
+
+    closeSettings.addEventListener('click', () => closeModal(settingsModal));
+    closeWallet.addEventListener('click', () => closeModal(walletModal));
+    closeClickUpgrades.addEventListener('click', () => closeModal(clickUpgradesModal));
+
+    vibrationToggle.addEventListener('change', function() {
+        settings.vibration = this.checked;
+        localStorage.setItem('vibration', this.checked);
+    });
+
+    backgroundIncomeToggle.addEventListener('change', function() {
+        settings.backgroundIncome = this.checked;
+        localStorage.setItem('backgroundIncome', this.checked);
+    });
+
+    tonButton.addEventListener('click', () => openModal(walletModal));
+    lightningButton.addEventListener('click', () => openModal(clickUpgradesModal));
+    incomePlus.addEventListener('click', () => {
+        navItems.forEach(item => item.classList.remove('active'));
+        document.querySelector('[data-page="upgrades-page"]').classList.add('active');
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById('upgrades-page').classList.add('active');
+        updateAllBalances();
+    });
+
+    connectWalletBtn.addEventListener('click', () => {
+        walletError.style.display = 'block';
+        setTimeout(() => {
+            closeModal(walletModal);
+            walletError.style.display = 'none';
+        }, 1500);
+    });
+
+    // Улучшение кликов
+    upgradeClickBtn.addEventListener('click', () => {
+        const cost = upgradeCosts.click[upgrades.click - 1];
+        if (upgrades.click < 10 && balance >= cost) {
+            balance -= cost;
+            upgrades.click++;
+            localStorage.setItem('clickLevel', upgrades.click);
+            localStorage.setItem('tapBalance', balance);
+            updateAllBalances();
+            updateUpgradesUI();
+        }
+    });
+
+    // Улучшение восстановления
+    upgradeRecoveryBtn.addEventListener('click', () => {
+        const cost = upgradeCosts.recovery[upgrades.recovery - 1];
+        if (upgrades.recovery < 10 && balance >= cost) {
+            balance -= cost;
+            upgrades.recovery++;
+            localStorage.setItem('recoveryLevel', upgrades.recovery);
+            localStorage.setItem('tapBalance', balance);
+            updateAllBalances();
+            updateUpgradesUI();
+        }
+    });
+
+    // Улучшение энергии
+    upgradeEnergyBtn.addEventListener('click', () => {
+        const cost = upgradeCosts.energy[upgrades.energy - 1];
+        if (upgrades.energy < 10 && balance >= cost) {
+            balance -= cost;
+            upgrades.energy++;
+            maxEnergy = upgradeValues.energy[upgrades.energy - 1];
+            localStorage.setItem('energyLevel', upgrades.energy);
+            localStorage.setItem('maxEnergy', maxEnergy);
+            localStorage.setItem('tapBalance', balance);
+            localStorage.setItem('tapEnergy', energy);
+            updateAllBalances();
+            updateUpgradesUI();
+            updateEnergyUI();
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            backgroundTime = Date.now();
+        } else {
+            recoverBackgroundEnergy();
+        }
+    });
+
+    function recoverBackgroundEnergy() {
+        const now = Date.now();
+        let secondsPassed = 0;
+
+        if (backgroundTime) {
+            secondsPassed = Math.floor((now - backgroundTime) / 1000);
+            backgroundTime = null;
+        } else {
+            secondsPassed = Math.floor((now - lastUpdateTime) / 1000);
+        }
+
+        if (secondsPassed > 0) {
+            const recoveryRate = upgradeValues.recovery[upgrades.recovery - 1];
+            const effectiveRecoveryRate = document.hidden ? recoveryRate / 2 : recoveryRate;
+            energy = Math.min(energy + secondsPassed * effectiveRecoveryRate, maxEnergy);
+            localStorage.setItem('tapEnergy', energy);
+            updateEnergyUI();
+        }
+
+        lastUpdateTime = now;
+        localStorage.setItem('lastUpdateTime', lastUpdateTime);
+    }
+
+    function animateBalance(newBalance) {
+        const duration = 300;
+        const start = parseFloat(balanceElement.textContent.replace(/,/g, '')) || 0;
+        const change = newBalance - start;
+        let startTime = null;
+
+        function animate(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const progress = currentTime - startTime;
+            const val = Math.floor(start + change * (progress / duration));
+
+            balanceElement.textContent = val.toLocaleString();
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                balanceElement.textContent = newBalance.toLocaleString();
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    coin.addEventListener('click', (e) => {
+        const coinsPerClick = upgradeValues.click[upgrades.click - 1];
+        const energyCost = coinsPerClick;
+
+        if (energy >= energyCost) {
+            energy -= energyCost;
+            localStorage.setItem('tapEnergy', energy);
+
+            const oldBalance = balance;
+            balance += coinsPerClick;
+            localStorage.setItem('tapBalance', balance);
+            animateBalanceWithStart(oldBalance, balance);
+            createClickEffect(e);
+            createPlusOne(e, coinsPerClick);
+
+            if (settings.vibration && navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
+            animateCoin(e);
+            showBalanceCounter(coinsPerClick);
+            updateEnergyUI();
+            updateAllBalances();
+            updateUpgradesUI();
+        }
+    });
+
+    function showBalanceCounter(amount) {
+        balanceCounter.textContent = `+${amount}`;
+        balanceCounter.style.opacity = '1';
+        balanceCounter.style.transform = 'translateY(-60px)';
+
+        setTimeout(() => {
+            balanceCounter.style.opacity = '0';
+            balanceCounter.style.transform = 'translateY(-50px)';
+        }, 1000);
+    }
+
+    function animateCoin(e) {
+        const rect = coin.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const deltaX = (e.clientX - centerX) / 20;
+        const deltaY = (e.clientY - centerY) / 20;
+
+        coin.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.95)`;
+
+        setTimeout(() => {
+            coin.style.transform = 'translate(0, 0) scale(1)';
+        }, 500);
+    }
+
+    function animateBalanceWithStart(startBalance, newBalance) {
+        const duration = 300;
+        const start = startBalance;
+        const change = newBalance - start;
+        let startTime = null;
+
+        function animate(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const progress = currentTime - startTime;
+            const val = Math.floor(start + change * (progress / duration));
+
+            balanceElement.textContent = val.toLocaleString();
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                balanceElement.textContent = newBalance.toLocaleString();
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    function startEnergyRecovery() {
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                const recoveryRate = upgradeValues.recovery[upgrades.recovery - 1];
+                const effectiveRecoveryRate = document.hidden ? recoveryRate / 2 : recoveryRate;
+                energy = Math.min(energy + effectiveRecoveryRate, maxEnergy);
+                localStorage.setItem('tapEnergy', energy);
+                updateEnergyUI();
+            }
+        }, 1000);
+    }
+
+    function createClickEffect(e) {
+        const effect = document.createElement('div');
+        effect.className = 'click-effect';
+        effect.style.left = `${e.clientX - 15}px`;
+        effect.style.top = `${e.clientY - 15}px`;
+        document.body.appendChild(effect);
+
+        setTimeout(() => {
+            effect.remove();
+        }, 500);
+    }
+
+    function createPlusOne(e, amount) {
+        const plusOne = document.createElement('div');
+        plusOne.className = 'plus-one';
+        plusOne.textContent = `+${amount}`;
+        plusOne.style.left = `${e.clientX - 15}px`;
+        plusOne.style.top = `${e.clientY - 30}px`;
+        document.body.appendChild(plusOne);
+
+        setTimeout(() => {
+            plusOne.remove();
+        }, 1000);
+    }
+
+    function updateUI() {
+        hourIncomeElement.textContent = hourIncome;
+        updateEnergyUI();
+        updateAllBalances();
+    }
+
+    function updateEnergyUI() {
+        const percent = (energy / maxEnergy) * 100;
+        energyBar.style.width = `${percent}%`;
+        energyText.textContent = `${Math.floor(energy)} / ${maxEnergy}`;
+
+        if (energy < maxEnergy * 0.3) {
+            energyBar.style.background = 'linear-gradient(90deg, #ff5555, #ff9999)';
+        } else {
+            energyBar.style.background = 'linear-gradient(90deg, #9147ff, #772ce8)';
+        }
+    }
+
+    // Инициализация игры с бонусом при первом входе
+    function initializeGame() {
+        const isFirstLaunch = localStorage.getItem('isFirstLaunch') === null;
+
+        if (isFirstLaunch) {
+            balance += 500;
+            localStorage.setItem('tapBalance', balance);
+            animateBalanceWithStart(balance - 500, balance);
+            showBalanceCounter(500);
+            localStorage.setItem('isFirstLaunch', 'false');
+        }
+    }
+
+    // Запуск всех функций инициализации
+    initializeGame();
+    checkReferralOnLoad();
     initUpgrades();
     recoverBackgroundEnergy();
     updateUI();
+    updateUpgradesUI();
+    updateFriendsUI();
     startEnergyRecovery();
-    
-    function animateBalance(newBalance) {
-      const duration = 300; // Duration of the animation in milliseconds
-      const start = parseFloat(balanceElement.textContent.replace(/,/g, '')) || 0;
-      const change = newBalance - start;
-      let startTime = null;
-
-      function animate(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const progress = currentTime - startTime;
-        const val = Math.floor(start + change * (progress / duration));
-
-        balanceElement.textContent = val.toLocaleString();
-        if (progress < duration) {
-          requestAnimationFrame(animate);
-        } else {
-          balanceElement.textContent = newBalance.toLocaleString();
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-    
-    coin.addEventListener('click', (e) => {
-      const coinsPerClick = upgradeValues.click[upgrades.click - 1];
-      const energyCost = coinsPerClick;
-      
-      if (energy >= energyCost) {
-        energy -= energyCost;
-        localStorage.setItem('tapEnergy', energy);
-        
-        const oldBalance = balance;
-        balance += coinsPerClick;
-        localStorage.setItem('tapBalance', balance);
-        
-        createClickEffect(e);
-        createPlusOne(e, coinsPerClick);
-        
-        if (settings.vibration && navigator.vibrate) {
-          navigator.vibrate(50);
-        }
-        
-        animateCoin(e);
-        animateBalance(balance);
-        showBalanceCounter(coinsPerClick);
-        updateEnergyUI();
-      }
-    });
-    
-    function showBalanceCounter(amount) {
-      balanceCounter.textContent = `+${amount}`;
-      balanceCounter.style.opacity = '1';
-      balanceCounter.style.transform = 'translateY(-60px)';
-      
-      setTimeout(() => {
-        balanceCounter.style.opacity = '0';
-        balanceCounter.style.transform = 'translateY(-50px)';
-      }, 1000);
-    }
-    
-    function animateCoin(e) {
-      const rect = coin.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      
-      const deltaX = (e.clientX - centerX) / 20;
-      const deltaY = (e.clientY - centerY) / 20;
-      
-      coin.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.95)`;
-      
-      setTimeout(() => {
-        coin.style.transform = 'translate(0, 0) scale(1)';
-      }, 500);
-    }
-    
-    function startEnergyRecovery() {
-      setInterval(() => {
-        if (energy < maxEnergy) {
-          const recoveryRate = upgradeValues.recovery[upgrades.recovery - 1];
-          const effectiveRecoveryRate = document.hidden ? recoveryRate / 2 : recoveryRate;
-          energy = Math.min(energy + effectiveRecoveryRate, maxEnergy);
-          localStorage.setItem('tapEnergy', energy);
-          updateEnergyUI();
-        }
-      }, 1000);
-    }
-    
-    function createClickEffect(e) {
-      const effect = document.createElement('div');
-      effect.className = 'click-effect';
-      effect.style.left = `${e.clientX - 15}px`;
-      effect.style.top = `${e.clientY - 15}px`;
-      document.body.appendChild(effect);
-      
-      setTimeout(() => {
-        effect.remove();
-      }, 500);
-    }
-    
-    function createPlusOne(e, amount) {
-      const plusOne = document.createElement('div');
-      plusOne.className = 'plus-one';
-      plusOne.textContent = `+${amount}`;
-      plusOne.style.left = `${e.clientX - 15}px`;
-      plusOne.style.top = `${e.clientY - 30}px`;
-      document.body.appendChild(plusOne);
-      
-      setTimeout(() => {
-        plusOne.remove();
-      }, 1000);
-    }
-    
-    function updateUI() {
-      hourIncomeElement.textContent = hourIncome;
-      updateEnergyUI();
-    }
-    
-    function updateEnergyUI() {
-      const percent = (energy / maxEnergy) * 100;
-      energyBar.style.width = `${percent}%`;
-      energyText.textContent = `${Math.floor(energy)} / ${maxEnergy}`;
-      
-      if (energy < maxEnergy * 0.3) {
-        energyBar.style.background = 'linear-gradient(90deg, #ff5555, #ff9999)';
-      } else {
-        energyBar.style.background = 'linear-gradient(90deg, #9147ff, #772ce8)';
-      }
-    }
-    
-    window.addEventListener('beforeunload', () => {
-      localStorage.setItem('lastUpdateTime', Date.now());
-    });
-  </script>
-</body>
-</html>
+</script>
